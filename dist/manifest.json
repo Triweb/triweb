@@ -1,0 +1,10 @@
+{
+  "id": "...",
+  "name": "triweb",
+  "version": "0.0.1a",
+  "base_url": "/",
+  "assets": [
+    ".../index.html",
+    ".../triweb.js"
+  ]
+}
