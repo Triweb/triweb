@@ -100,7 +100,8 @@ with `Triweb.Container.reloadArgs()`.
  * Holds an array of runtime arguments for the `Triweb.Container` that have been extracted
  * from DNS TXT records associated with the domain name prefixed by "_triweb.". These
  * arguments provide configuration or operational parameters for the container,
- * derived from the DNS TXT records of the form "keyword1 keyword1-value option1=val1 option2=val2".
+ * derived from the DNS TXT records of the form:
+ * `_triweb.domain.example TXT "keyword1 keyword1-value option1=val1 option2=val2"`
  *
  * Each entry in the array represents a single TXT record, parsed into an object with
  * a `key`, a `value`, and an `options` object. The `options` object maps option
@@ -196,26 +197,33 @@ the browser will serve the asset from the TWA with lower priority first.
  *                               
  * @param {Object} [opts={}] - Optional parameters to customize the installation process.
  * 
- *   @param {boolean} [opts.update=false] - If set to true, the method will attempt to update the application
- *                                          if it is already installed.
+ *   @param {boolean} [opts.update=false] - If set to true, the method will attempt to update 
+ *                                          the application if it is already installed.
  *                                          
- *   @param {boolean} [opts.force=false] - If set to true, the installation will proceed even if the application
- *                                         with the same ID is already installed in the container, overwriting it.
- *                                         You can use it to force reinstallation, or to overwrite an existing TWA
- *                                         with a conflicting app ID.
+ *   @param {boolean} [opts.force=false] - If set to true, the installation will proceed even 
+ *                                         if the application with the same ID is already 
+ *                                         installed in the container, overwriting it.
+ *                                         You can use it to force reinstallation, or to 
+ *                                         overwrite an existing TWA with a conflicting 
+ *                                         app ID.
  *                                         
- *   @param {boolean} [opts.priority=null] - A numeric priority of this TWA. When there are conflicting asset files,
- *                                           upon request, the browser will serve the asset from the TWA with a lower 
- *                                           priority first. When left as null, the app will be installed after all
- *                                           previously installed TWAs.
+ *   @param {boolean} [opts.priority=null] - A numeric priority of this TWA. When there are 
+ *                                           conflicting asset files, upon request, 
+ *                                           the browser will serve the asset from the TWA 
+ *                                           with a lower priority first. When left as null, 
+ *                                           the app will be installed after all previously 
+ *                                           installed TWAs.
  *
- * @returns {Triweb.Container.Jobs.AppInstall} An `AppInstallJob` thenable object that provides methods and properties 
- *                                             to monitor the installation progress and status. This object resolves to
- *                                             the installed app ID upon successful installation or update, or
- *                                             to false when update was requested but the app is at the latest version.
+ * @returns {Triweb.Container.Jobs.AppInstall} - An `AppInstallJob` thenable object that 
+ *                                           provides methods and properties to 
+ *                                           monitor the installation progress and status. 
+ *                                           This object resolves to the installed app ID 
+ *                                           upon successful installation or update, or
+ *                                           to false when update was requested but 
+ *                                           the app is at the latest version.
  *                                             
  *                          
- * @throws {Triweb.Container.Jobs.AppInstall.Error} Various error codes may be thrown during the installation process:
+ * @throws {Triweb.Container.Jobs.AppInstall.Error} Various error codes may be thrown:
  *   - `manifestUrlInvalid`: The URL of the manifest file is not valid.
  *   - `manifestDownloadError`: The application manifest file could not be downloaded.
  *   - `manifestParsingError`: The application manifest file is not a valid JSON document.
@@ -257,11 +265,19 @@ and additional meta information.
  * Lists the TWAs that are present in the Container into a dictionary object.
  *
  * @returns {Promise<Record<string, {
- *             id: string,                          // The app's unique identifier as defined in its manifest file.
+ *             
+ *             id: string,                          // The app's unique identifier 
+ *                                                  // as defined in its manifest file.
+ 
  *             assets: Triweb.Container.AppAssets,  // App asset files.
+ 
  *             manifest: Object,                    // Application manifest data.
- *             manifestUrl: string,                 // The URL from which the manifest file was originally downloaded.
- *             version: string,                     // The installed version of the application.
+ *             
+ *             manifestUrl: string,                 // The URL from which the manifest 
+ *                                                  // file was originally downloaded.
+ *                                                  
+ *             version: string,                     // The installed app version.
+ *             
  *           }>>} A promise that resolves with a dictionary object.
  *                The keys of the dictionary are app IDs, and the values are objects
  *                containing details about each app.
@@ -283,28 +299,32 @@ Uninstalls the TWA with a given id from the Container.
 
 ```javascript
 /**
- * Uninstalls a TWA from the container. This operation removes all the TWA's assets from the container,
- * effectively deleting the application from the user's browser. If the application is not installed,
- * this method will silently fail without any errors. This ensures idempotency of the uninstall operation.
+ * Uninstalls a TWA from the container. This operation removes all the TWA's assets 
+ * from the container, effectively deleting the application from the user's browser. 
+ * If the application is not installed, this method will silently fail without any errors. 
+ * This ensures idempotency of the uninstall operation.
  * 
- * @param {string} appId - The unique identifier of the TWA to be uninstalled. This ID should match
- *                         the app's ID as defined in its manifest file and as used in the container's
- *                         application list.
+ * @param {string} appId - The unique identifier of the TWA to be uninstalled. This ID should 
+ *                         match the app's ID as defined in its manifest file and as used in 
+ *                         the container's application list.
  *
- * @param {Object} [opts={}] - Optional parameters to customize the uninstallation process. Includes:
+ * @param {Object} [opts={}] - Optional parameters to customize the uninstallation process:
  * 
- *   @param {boolean} [opts.recursive=false] - If set to true, uninstall the app and its dependencies.
- *   @param {boolean} [opts.prune=false]     - If set to true, uninstall any apps that depend on this app.
- *   @param {boolean} [opts.force=false]     - If set to true, force uninstallation, ignoring dependency checks.
+ *   @param {boolean} [opts.recursive=false] - If true, uninstall the app and its dependencies.
+ *   @param {boolean} [opts.prune=false]     - If true, uninstall any apps that depend on this app.
+ *   @param {boolean} [opts.force=false]     - If true, force uninstallation, ignoring dependency checks.
  * 
- * @returns {Triweb.Container.Jobs.AppUninstall} An `AppUninstall` thenable object that provides methods and properties 
- *                                               to monitor the installation progress and status. 
- *                                               This object resolves to `true` if the application was successfully uninstalled, 
- *                                               or `false` if the application was not found in the container.
+ * @returns {Triweb.Container.Jobs.AppUninstall} An `AppUninstall` thenable object that 
+ *                                           provides methods and properties to monitor 
+ *                                           the installation progress and status. 
+ *                                           This object resolves to `true` if the application 
+ *                                           was successfully uninstalled, or `false` if 
+ *                                           the application was not found in the container.
  * 
- * @throws {Triweb.Container.Jobs.AppUninstall.Error} Various error codes may be thrown during the uninstallation process:
- *   - `dependencyConflict`: The provided app ID is required as a dependency by another installed app. 
- *                           You can use `prune` or `force` flags to overcome this. 
+ * @throws {Triweb.Container.Jobs.AppUninstall.Error} Various error codes may be thrown:
+ *   - `dependencyConflict`: The provided app ID is required as a dependency 
+ *                           by another installed app. You can use `prune` or `force` 
+ *                           opts flags to overcome this. 
  * 
  * @example
  *   // Uninstall an app by its ID
