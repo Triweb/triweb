@@ -1,14 +1,14 @@
 # triweb
 
-The official **triweb.js** library and its documentation - a part of the [triweb platform](https://triweb.com).
+The official **triweb.js** library and developer documentation for the [triweb platform](https://triweb.com).
 
 It may be used by Triweb App (TWA) developers to enhance the functionality of their apps :muscle:                            
 
 ## Status
 
-Triweb has just launched, and the `triweb.js` library is in early beta phase.
+Triweb has just launched and the `triweb.js` library is in early beta phase.
 
-It works, and you can use it in your TWAs, but it should be considered unstable - 
+The described API works, and you can use it in your TWAs, but it should be considered unstable - 
 we are likely to introduce breaking changes (and awesome new features) in the near future, 
 so stay tuned for the updates and the first stable release! 
 
@@ -18,7 +18,7 @@ The current version is **0.0.1**
 
 ## Usage
 
-In production-ready TWAs you should use the triweb.js library that is offered by the target domain's relay server:
+In production-ready TWAs you can use the triweb.js library that is offered by the target domain's relay server:
 
 ```
 <script src="/.../triweb.js"></script>
@@ -30,7 +30,7 @@ During development you may use your local copy of the `triweb.js` library or the
 <script src="https://triweb.io/.../triweb.js"></script>
 ```
 
-## Public API Reference
+## API Reference
 
 ### Triweb.Container
 
@@ -40,6 +40,11 @@ The `Triweb.Container` is a namespace under which various container management o
 **Synopsis:**
 
 ```javascript
+// Runtime envrionment
+await Triweb.Container.init()
+Triweb.Container.args // Array of container runtime arguments as read from DNS TXT records
+                      // {{key: string, value: string, options: Record<string, string>}[]}
+
 // Application package management
 await Triweb.Container.installApp('banner/themes/default'); // true
 await Triweb.Container.installApp('banner/themes/html5up/dimension'); // true
@@ -47,10 +52,129 @@ await Triweb.Container.listApps(); // {...: {…}, banner-themes-default: {…},
 await Triweb.Container.uninstallApp('banner/themes/default'); // true
 
 ```
-   
+
+#### async Triweb.Container.init()
+
+Initializes the container by populating the `args` property.
+This method should be called at the start of the interaction with the `Triweb.Container` interface.
+
+<details>
+
+```javascript
+/**
+ * Initializes the `Triweb.Container` for the current domain. This method sets up
+ * the necessary environment, dependencies, or state required for the container to
+ * function correctly. It should be called before using any functionalities offered
+ * by the `Triweb.Container`.
+ * 
+ * @async
+ * @returns {Promise<void>} A promise that resolves when the container has been
+ * successfully initialized. If the initialization fails, the promise will be
+ * rejected with an error detailing the failure.
+ * 
+ * @example
+ * // Initialize the Triweb.Container before usage
+ * await Triweb.Container.init().then(() => {
+ *   console.log('Container initialized successfully.');
+ * }).catch((error) => {
+ *   console.error('Container initialization failed:', error);
+ * });
+ */
+async Triweb.Container.init()
+
+```
+
+</details>
+
+#### Triweb.Container.args
+
+Holds an array of runtime arguments for the Container as read from DNS TXT records.
+This includes the record with `app` key that has been used to setup the current TWA for the domain.
+The array is populated by `Triweb.Container.init()` and can be reloaded 
+with `Triweb.Container.reloadArgs()`.
+
+<details>
+
+```javascript
+/**
+ * Holds an array of runtime arguments for the `Triweb.Container` that have been extracted
+ * from DNS TXT records associated with the domain name prefixed by "_triweb.". These
+ * arguments provide configuration or operational parameters for the container,
+ * derived from the DNS TXT records of the form "keyword1 keyword1-value option1=val1 option2=val2".
+ *
+ * Each entry in the array represents a single TXT record, parsed into an object with
+ * a `key`, a `value`, and an `options` object. The `options` object maps option
+ * names to their respective values.
+ *
+ * @type {{key: string, value: string, options: Record<string, string>}[]}
+ *
+ * @example
+ * // Example of accessing the Triweb.Container.args
+ * const args = Triweb.Container.args;
+ *
+ * args.forEach(arg => {
+ *   console.log(`Key: ${arg.key}, Value: ${arg.value}`);
+ *   Object.entries(arg.options).forEach(([key, value]) => {
+ *     console.log(`Option: ${key}, Value: ${value}`);
+ *   });
+ * });
+ *
+ * @note The `args` variable is populated at the initialization phase of the Container.
+ * Ensure `Triweb.Container.init()` has been successfully called before accessing it.
+ */
+Triweb.Container.args
+```
+
+</details>
+
+#### async Triweb.Container.reloadArgs()
+
+Reloads the runtime arguments stored in `Triweb.Container.args` by re-fetching the DNS TXT records.
+
+<details>
+
+```javascript
+/**
+ * Reloads the runtime arguments stored in `Triweb.Container.args` by re-fetching
+ * the DNS TXT records for the domain name prefixed with "_triweb.". This operation
+ * updates the container's runtime arguments to reflect any changes in the DNS TXT
+ * records, accommodating new configurations or options added since the initial load
+ * or the last reload. It's particularly useful when runtime configurations might
+ * change frequently or when fresh values are necessary without restarting the container
+ * or the application.
+ * 
+ * This method performs DNS-over-HTTPS (DoH) resolution using the resolver specified
+ * in `Triweb.Container.resolver`. It ensures that `Triweb.Container.args` contains
+ * the most up-to-date information fetched from the DNS TXT records.
+ * 
+ * @async
+ * @returns {Promise<{key: string, value: string, options: Record<string, string>}[]>} 
+ *            A promise that resolves with the reloaded arguments array when the args have 
+ *            been successfully reloaded. The promise may be rejected with an error 
+ *            detailing the failure, especially in cases of failed `fetch()` calls due to 
+ *            issues with DoH resolution or connectivity problems with the 
+ *            `Triweb.Container.resolver` used for DNS resolution.
+ * 
+ * @throws {Error} Throws an exception if the DNS TXT record fetch fails, which can occur 
+ *                 due to network issues, incorrect DNS setup, 
+ *                 or problems with the DoH resolver.
+ * 
+ * @example
+ * // Reload the Triweb.Container.args and handle the updated arguments or errors
+ * Triweb.Container.reloadArgs().then((updatedArgs) => {
+ *   console.log('Arguments reloaded successfully:', updatedArgs);
+ * }).catch((error) => {
+ *   console.error('Failed to reload arguments:', error);
+ * });
+ */
+async Triweb.Container.reloadArgs()
+```
+
+</details>
+
 #### async Triweb.Container.installApp(manifestUrl, opts={})
 
-Installs the specified TWA to the container.
+Installs the specified TWA to the local Triweb.Container.
 When a TWA is installed, its assets specified in the `manifest.json` file are copied to the container in the user's web browser, 
 and the browser serves them directly from the container, without a need to communicate with any web servers.
 When multiple TWAs have conflicting asset paths (e.g., two TWAs include `/index.html` as asset file), 
@@ -60,17 +184,17 @@ the browser will serve the asset from the TWA with lower priority first.
 
 ```javascript
 /**
- * Installs a TWA from a given manifest URL with its dependencies to the local Triweb.Container.
+ * Installs a TWA from a given manifest URL with its dependencies to the Triweb.Container.
  * 
- * This method supports optional configuration options that can be passed to customize the installation process,
- * including flags to control update behavior and force installation.
+ * This method supports optional configuration options that can be passed to customize the 
+ * installation process, including flags to control update behavior and force installation.
  *
- * @param {string} manifestUrl - The URL of the TWA manifest file. This URL should point to a JSON
- *                               file that contains metadata about the application to be installed,
- *                               or to an entry in the TWApps catalog.
+ * @param {string} manifestUrl - The URL of the TWA manifest file. This URL should point to
+ *                               a JSON file that contains metadata about the application 
+ *                               to be installed, or to an entry in the TWApps catalog.
  *                               For more details see https://triweb.com/concepts/triweb-app
  *                               
- * @param {Object} [opts={}] - Optional parameters to customize the installation process. Includes:
+ * @param {Object} [opts={}] - Optional parameters to customize the installation process.
  * 
  *   @param {boolean} [opts.update=false] - If set to true, the method will attempt to update the application
  *                                          if it is already installed.
