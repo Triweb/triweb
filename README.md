@@ -2,7 +2,7 @@
 
 The official **triweb.js** library and developer documentation for the [triweb platform](https://triweb.com).
 
-It may be used by Triweb App (TWA) developers to enhance the functionality of their apps :muscle:                            
+To be used by [Triweb App (TWA)](https://triweb.com/concepts/triweb-app) developers to enhance the functionality of their apps :muscle:                            
 
 ## Status
 
