@@ -1,8 +1,29 @@
-# triweb
+<p align="center">
+  <a href="https://vercel.com">
+    <img src="https://triweb.com/branding/triweb-logo-light-padding.png" height="96">
+    <h3 align="center">triweb</h3>
+  </a>
+</p>
+
+<p align="center">
+  Open platform for decentralized web
+</p>
+
+<p align="center">
+  <a href="https://triweb.com/"><strong>Homepage</strong></a> ·
+  <a href="https://triweb.com/guide"><strong>Docs</strong></a> ·
+  <a href="https://triweb.com/tutorial/1"><strong>Tutorial</strong></a>
+</p>
+
+<br/>
+<hr/>
 
 The official **triweb.js** library and developer documentation for the [triweb platform](https://triweb.com).
 
-To be used by [Triweb App (TWA)](https://triweb.com/concepts/triweb-app) developers to enhance the functionality of their apps :muscle:                            
+To be used by [Triweb App (TWA)](https://triweb.com/concepts/triweb-app) developers to enhance the functionality of their apps :muscle:
+
+<hr/>
+<br/>
 
 ## Status
 
@@ -11,10 +32,6 @@ Triweb has just launched and the `triweb.js` library is in early beta phase.
 The described API works, and you can use it in your TWAs, but it should be considered unstable - 
 we are likely to introduce breaking changes (and awesome new features) in the near future, 
 so stay tuned for the updates and the first stable release! 
-
-## Version
-
-The current version is **0.0.1**
 
 ## Usage
 
