@@ -7,7 +7,9 @@
  * Copyright (c) 2024, Shore Labs Zbigniew Zemła - triweb.com
  *
  * All rights reserved.
- * Use of this software is subject to the licensing terms published by the copyright holder.
+ *
+ * Use of this software is subject to the licensing terms published
+ * or otherwise made available directly to you by the copyright holder.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE

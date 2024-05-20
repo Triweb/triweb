@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://vercel.com">
+  <a href="https://triweb.com/">
     <img src="https://triweb.com/branding/triweb-logo-light-padding.png" height="96">
     <h3 align="center">triweb</h3>
   </a>
